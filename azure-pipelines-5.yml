@@ -1,0 +1,22 @@
+trigger:
+- main
+
+pool:
+  name: Default   # your self-hosted agent pool
+
+steps:
+- script: echo "Building my project..."
+  displayName: "Build Step"
+
+- powershell: |
+    if (!(Test-Path -Path "$(Build.ArtifactStagingDirectory)")) {
+      New-Item -ItemType Directory -Path "$(Build.ArtifactStagingDirectory)"
+    }
+    "This is my build output" | Out-File "$(Build.ArtifactStagingDirectory)\output.txt"
+  displayName: "Prepare Artifact (Windows PowerShell)"
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
