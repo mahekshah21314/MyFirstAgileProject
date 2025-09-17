@@ -1,0 +1,16 @@
+jobs:
+- job: Build
+  steps:
+  - script: echo "Hello" > $(Build.ArtifactStagingDirectory)/hello.txt
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      ArtifactName: 'drop'
+
+- job: Deploy
+  dependsOn: Build
+  steps:
+  - download: current
+    artifact: drop
+  - script: type $(Pipeline.Workspace)\drop\hello.txt
+    displayName: "Read artifact file"
